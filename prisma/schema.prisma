@@ -1,0 +1,173 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// --------------------
+// ENUMS
+// --------------------
+enum UserRole {
+  recruiter
+  researcher
+  admin
+}
+
+enum JobType {
+  fulltime
+  parttime
+  contract
+}
+
+enum ApplicationStatus {
+  submitted
+  reviewed
+  accepted
+  rejected
+}
+
+enum JobStatus {
+  open
+  closed
+}
+
+enum Industry {
+  // Replace … with your industries
+  TECHNOLOGY
+  FINANCE
+  HEALTHCARE
+  EDUCATION
+  OTHER
+}
+
+// --------------------
+// MODELS
+// --------------------
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  recruiter     RecruiterUser?
+  researcher    ResearcherUser?
+  notifications Notification[]
+}
+
+model RecruiterUser {
+  id        Int @id @default(autoincrement())
+  userId    Int @unique
+  companyId Int
+
+  user     User         @relation(fields: [userId], references: [id])
+  company  Company      @relation(fields: [companyId], references: [id])
+  jobPosts JobPosting[]
+}
+
+model Company {
+  id        Int       @id @default(autoincrement())
+  name      String
+  industry  Industry?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  recruiters RecruiterUser[]
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  researchers ResearcherUserSkill[]
+}
+
+model ResearcherUserSkill {
+  researcherUserId Int
+  skillId          Int
+
+  researcherUser ResearcherUser @relation(fields: [researcherUserId], references: [id], onDelete: Cascade)
+  skill          Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([researcherUserId, skillId])
+}
+
+model ResearcherUser {
+  id       Int  @id @default(autoincrement())
+  userId   Int  @unique
+  resumeId Int? @unique // ensure 1-to-1 mapping
+
+  user   User                  @relation(fields: [userId], references: [id])
+  resume Resume?               @relation("ResearcherResume")
+  skills ResearcherUserSkill[]
+  apps   Application[]
+}
+
+model Resume {
+  id               Int       @id @default(autoincrement())
+  researcherUserId Int       @unique
+  birthDate        DateTime?
+  nrc              String?
+  pdfUrl           String?
+  imageUrl         String?
+  createdAt        DateTime  @default(now())
+
+  researcherUser ResearcherUser @relation("ResearcherResume", fields: [researcherUserId], references: [id], onDelete: Cascade)
+}
+
+model JobPosting {
+  id              Int       @id @default(autoincrement())
+  recruiterUserId Int
+  title           String
+  description     String
+  jobType         JobType
+  location        String?
+  salaryRange     String?
+  status          JobStatus
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  recruiter    RecruiterUser @relation(fields: [recruiterUserId], references: [id])
+  applications Application[]
+}
+
+model Application {
+  id               Int               @id @default(autoincrement())
+  researcherUserId Int
+  jobId            Int
+  status           ApplicationStatus
+  createdAt        DateTime          @default(now())
+
+  researcherUser ResearcherUser @relation(fields: [researcherUserId], references: [id])
+  job            JobPosting     @relation(fields: [jobId], references: [id])
+  notifications  Notification[]
+}
+
+model Notification {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  message       String
+  applicationId Int?
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  user        User         @relation(fields: [userId], references: [id])
+  application Application? @relation(fields: [applicationId], references: [id])
+}
