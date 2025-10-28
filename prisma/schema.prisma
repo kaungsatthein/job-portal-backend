@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 // prisma/schema.prisma
@@ -21,9 +20,15 @@ datasource db {
 // ENUMS
 // --------------------
 enum UserRole {
+  admin
   recruiter
   researcher
-  admin
+}
+
+enum AuthProvider {
+  local
+  google
+  github // Add more as needed
 }
 
 enum JobType {
@@ -44,120 +49,110 @@ enum JobStatus {
   closed
 }
 
-enum Industry {
-  // Replace … with your industries
-  TECHNOLOGY
-  FINANCE
-  HEALTHCARE
-  EDUCATION
-  OTHER
-}
-
 // --------------------
 // MODELS
 // --------------------
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  role         UserRole
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String? // null for OAuth users
   name         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         UserRole  @default(researcher)
+  companyId    Int?
+  resumeUrl    String?
+  birthDate    DateTime?
+  nrc          String?
 
-  recruiter     RecruiterUser?
-  researcher    ResearcherUser?
+  // Google OAuth fields
+  google_id    String? @unique
+  google_email String?
+  avatar_url   String?
+  provider     String? @default("local") // "local" or "google"
+
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  company       Company?       @relation(fields: [companyId], references: [id])
+  jobPosts      JobPosting[]   @relation("RecruiterJobs")
+  applications  Application[]  @relation("ResearcherApps")
   notifications Notification[]
+  Account       Account[]
+  JobPosting    JobPosting[]
+  Application   Application[]
 }
 
-model RecruiterUser {
-  id        Int @id @default(autoincrement())
-  userId    Int @unique
-  companyId Int
+model Account {
+  id                Int       @id @default(autoincrement())
+  userId            Int
+  provider          String // 'google', 'github'
+  providerAccountId String // unique id from provider
+  accessToken       String?   @db.Text
+  refreshToken      String?   @db.Text
+  expiresAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  user     User         @relation(fields: [userId], references: [id])
-  company  Company      @relation(fields: [companyId], references: [id])
-  jobPosts JobPosting[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
 }
 
 model Company {
-  id        Int       @id @default(autoincrement())
-  name      String
-  industry  Industry?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String
+  industryId Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  recruiters RecruiterUser[]
+  industry    Industry?    @relation(fields: [industryId], references: [id])
+  recruiters  User[]
+  jobPostings JobPosting[]
 }
 
-model Skill {
+model Industry {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  researchers ResearcherUserSkill[]
-}
-
-model ResearcherUserSkill {
-  researcherUserId Int
-  skillId          Int
-
-  researcherUser ResearcherUser @relation(fields: [researcherUserId], references: [id], onDelete: Cascade)
-  skill          Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
-
-  @@id([researcherUserId, skillId])
-}
-
-model ResearcherUser {
-  id       Int  @id @default(autoincrement())
-  userId   Int  @unique
-  resumeId Int? @unique // ensure 1-to-1 mapping
-
-  user   User                  @relation(fields: [userId], references: [id])
-  resume Resume?               @relation("ResearcherResume")
-  skills ResearcherUserSkill[]
-  apps   Application[]
-}
-
-model Resume {
-  id               Int       @id @default(autoincrement())
-  researcherUserId Int       @unique
-  birthDate        DateTime?
-  nrc              String?
-  pdfUrl           String?
-  imageUrl         String?
-  createdAt        DateTime  @default(now())
-
-  researcherUser ResearcherUser @relation("ResearcherResume", fields: [researcherUserId], references: [id], onDelete: Cascade)
+  companies Company[]
 }
 
 model JobPosting {
-  id              Int       @id @default(autoincrement())
-  recruiterUserId Int
-  title           String
-  description     String
-  jobType         JobType
-  location        String?
-  salaryRange     String?
-  status          JobStatus
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id          Int       @id @default(autoincrement())
+  recruiterId Int
+  companyId   Int
+  title       String
+  description String
+  jobType     JobType
+  location    String?
+  salaryRange String?
+  status      JobStatus @default(open)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  recruiter    RecruiterUser @relation(fields: [recruiterUserId], references: [id])
+  // Relations with explicit names
+  recruiter    User          @relation("RecruiterJobs", fields: [recruiterId], references: [id])
+  company      Company       @relation(fields: [companyId], references: [id])
   applications Application[]
+  User         User?         @relation(fields: [userId], references: [id])
+  userId       Int?
 }
 
 model Application {
-  id               Int               @id @default(autoincrement())
-  researcherUserId Int
-  jobId            Int
-  status           ApplicationStatus
-  createdAt        DateTime          @default(now())
+  id           Int               @id @default(autoincrement())
+  researcherId Int
+  jobId        Int
+  status       ApplicationStatus @default(submitted)
+  createdAt    DateTime          @default(now())
 
-  researcherUser ResearcherUser @relation(fields: [researcherUserId], references: [id])
-  job            JobPosting     @relation(fields: [jobId], references: [id])
-  notifications  Notification[]
+  researcher    User           @relation("ResearcherApps", fields: [researcherId], references: [id])
+  job           JobPosting     @relation(fields: [jobId], references: [id])
+  notifications Notification[]
+  User          User?          @relation(fields: [userId], references: [id])
+  userId        Int?
 }
 
 model Notification {
