@@ -143,6 +143,140 @@
           "Auth"
         ]
       }
+    },
+    "/industry": {
+      "post": {
+        "operationId": "IndustryController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateIndustryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Industry created successfully"
+          },
+          "500": {
+            "description": "Failed to create industry"
+          }
+        },
+        "summary": "Create a new industry",
+        "tags": [
+          "Industry"
+        ]
+      },
+      "get": {
+        "operationId": "IndustryController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of industries"
+          },
+          "500": {
+            "description": "Failed to fetch industries"
+          }
+        },
+        "summary": "Get all industries",
+        "tags": [
+          "Industry"
+        ]
+      }
+    },
+    "/industry/{id}": {
+      "get": {
+        "operationId": "IndustryController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Industry ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Industry found"
+          },
+          "404": {
+            "description": "Industry not found"
+          }
+        },
+        "summary": "Get a single industry by ID",
+        "tags": [
+          "Industry"
+        ]
+      },
+      "patch": {
+        "operationId": "IndustryController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Industry ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateIndustryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Industry updated successfully"
+          },
+          "500": {
+            "description": "Failed to update industry"
+          }
+        },
+        "summary": "Update an existing industry",
+        "tags": [
+          "Industry"
+        ]
+      },
+      "delete": {
+        "operationId": "IndustryController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Industry ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Industry deleted successfully"
+          },
+          "500": {
+            "description": "Failed to delete industry"
+          }
+        },
+        "summary": "Delete an industry by ID",
+        "tags": [
+          "Industry"
+        ]
+      }
     }
   },
   "info": {
@@ -181,6 +315,29 @@
           "email",
           "password"
         ]
+      },
+      "CreateIndustryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the industry",
+            "example": "Information Technology"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "UpdateIndustryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the industry",
+            "example": "Information Technology"
+          }
+        }
       }
     }
   },
