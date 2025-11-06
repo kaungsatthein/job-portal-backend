@@ -15,6 +15,7 @@ import { AuthService } from './auth.service';
 import type { Response, Request } from 'express';
 import { Public } from 'src/common/decorators/public';
 import { AuthGuard } from '@nestjs/passport';
+import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -131,7 +132,8 @@ export class AuthController {
 
   @Public()
   @Get('google')
-  @UseGuards(AuthGuard('google'))
+  // @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleAuthGuard)
   @ApiQuery({
     name: 'role',
     required: false,
