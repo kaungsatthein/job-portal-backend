@@ -11,7 +11,6 @@ export class GoogleAuthGuard extends AuthGuard('google') {
   getAuthenticateOptions(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const role = request.query.role || 'researcher';
-    console.log('Passing role to Google as state:', role);
 
     return {
       scope: ['email', 'profile'],

@@ -30,10 +30,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     // Extract role from query param (default to 'researcher')
     // const role = (req.query.role as UserRole) || UserRole.researcher;
     let role: UserRole = UserRole.researcher;
-    console.log('req.query.state', req.query.state);
     if (req.query.state) {
       const state = JSON.parse(req.query.state as string);
-      console.log('state.role', state.role);
       role = (state.role as UserRole) || UserRole.researcher;
     }
     const user = {
