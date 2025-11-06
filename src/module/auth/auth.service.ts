@@ -17,41 +17,41 @@ export class AuthService {
   }
 
   async validateGoogleUser(googleUserData: GoogleAuthDto): Promise<any> {
-    const { googleId, email, firstName, lastName, picture } = googleUserData;
+    const { googleId, email, firstName, lastName, picture, role } =
+      googleUserData;
 
-    // Check if user exists with Google ID
+    // Check if user exists by Google ID
     let user = await this.userService.findUserByGoogleId(googleId);
 
     if (user) {
-      // Update user info if needed
       user = await this.userService.updateGoogleUser(user.id, {
         googleId,
         email,
         firstName,
         lastName,
         picture,
+        role,
       });
     } else {
-      // Check if user exists with email
       const existingUser = await this.userService.findUserByGoogleEmail(email);
 
       if (existingUser) {
-        // Link Google account to existing user
         user = await this.userService.updateGoogleUser(existingUser.id, {
           googleId,
           email,
           firstName,
           lastName,
           picture,
+          role,
         });
       } else {
-        // Create new user
         user = await this.userService.createGoogleUser({
           googleId,
           email,
           firstName,
           lastName,
           picture,
+          role,
         });
       }
     }

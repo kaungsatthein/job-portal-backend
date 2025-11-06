@@ -9,7 +9,7 @@ import {
   UseGuards,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthService } from './auth.service';
 import type { Response, Request } from 'express';
@@ -132,7 +132,13 @@ export class AuthController {
   @Public()
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Initiate Google OAuth login' })
+  @ApiQuery({
+    name: 'role',
+    required: false,
+    description:
+      'User role (admin, recruiter, researcher). Defaults to researcher.',
+    enum: ['admin', 'recruiter', 'researcher'],
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Redirects to Google OAuth',
@@ -140,12 +146,20 @@ export class AuthController {
   async googleAuth(@Req() req: Request) {
     // This endpoint initiates the Google OAuth flow
     // The user will be redirected to Google for authentication
+    //front-end will send like this /auth/google?role=admin
   }
 
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Google OAuth callback' })
+  @ApiQuery({
+    name: 'role',
+    required: false,
+    description:
+      'User role sent from frontend during OAuth initiation. Defaults to researcher.',
+    enum: ['admin', 'recruiter', 'researcher'],
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Google OAuth callback processed',
@@ -161,14 +175,10 @@ export class AuthController {
       const envMode = process.env.NODE_ENV?.trim();
       const frontendUrl = process.env.FRONTEND_URL as string;
 
-      // Set authentication cookies
+      // Set cookies
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
         httpOnly: true,
         secure: envMode === 'production',
-        domain:
-          envMode === 'production'
-            ? process.env.FRONTEND_PUBLIC_PROD_URL
-            : undefined,
         sameSite: envMode === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000,
       });
@@ -176,15 +186,10 @@ export class AuthController {
       res.cookie(`refresh_token_${envMode}`, tokens.refreshToken, {
         httpOnly: true,
         secure: envMode === 'production',
-        domain:
-          envMode === 'production'
-            ? process.env.FRONTEND_PUBLIC_PROD_URL
-            : undefined,
         sameSite: envMode === 'production' ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      // Redirect to frontend with success status
       res.redirect(`${frontendUrl}?success=true`);
       return { message: 'Authentication successful', user: user } as any;
     } catch (error) {
@@ -210,11 +215,10 @@ export class AuthController {
     return {
       id: user.id,
       email: user.email,
-      full_name: user.full_name,
+      name: user.name,
       avatar_url: user.avatar_url,
       provider: user.provider,
       role: user.role,
-      department: user.department,
     };
   }
 }

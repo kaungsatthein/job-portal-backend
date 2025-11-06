@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { UserRole } from '@prisma/client';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class GoogleAuthDto {
   @ApiProperty({ description: 'Google user ID' })
@@ -36,6 +43,9 @@ export class GoogleAuthDto {
   @IsOptional()
   @IsString()
   refreshToken?: string;
+
+  @IsEnum(UserRole)
+  role: UserRole;
 }
 
 export class GoogleAuthResponseDto {
