@@ -396,6 +396,170 @@
           "Company"
         ]
       }
+    },
+    "/job-postings": {
+      "post": {
+        "operationId": "JobPostingController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJobPostingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Job created successfully"
+          }
+        },
+        "summary": "Create a new job posting",
+        "tags": [
+          "Job Postings"
+        ]
+      },
+      "get": {
+        "operationId": "JobPostingController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of job postings"
+          }
+        },
+        "summary": "Get all job postings",
+        "tags": [
+          "Job Postings"
+        ]
+      }
+    },
+    "/job-postings/{id}": {
+      "get": {
+        "operationId": "JobPostingController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job posting found"
+          }
+        },
+        "summary": "Get a job posting by ID",
+        "tags": [
+          "Job Postings"
+        ]
+      },
+      "patch": {
+        "operationId": "JobPostingController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateJobPostingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Job updated successfully"
+          }
+        },
+        "summary": "Update a job posting by ID",
+        "tags": [
+          "Job Postings"
+        ]
+      },
+      "delete": {
+        "operationId": "JobPostingController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job deleted successfully"
+          }
+        },
+        "summary": "Delete a job posting by ID",
+        "tags": [
+          "Job Postings"
+        ]
+      }
+    },
+    "/job-postings/company/{companyId}": {
+      "get": {
+        "operationId": "JobPostingController_findByCompany",
+        "parameters": [
+          {
+            "name": "companyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get job postings by company",
+        "tags": [
+          "Job Postings"
+        ]
+      }
+    },
+    "/job-postings/recruiter/{recruiterId}": {
+      "get": {
+        "operationId": "JobPostingController_findByRecruiter",
+        "parameters": [
+          {
+            "name": "recruiterId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get job postings by recruiter",
+        "tags": [
+          "Job Postings"
+        ]
+      }
     }
   },
   "info": {
@@ -484,6 +648,107 @@
           "industryId": {
             "type": "string",
             "description": "Industry ID"
+          }
+        }
+      },
+      "CreateJobPostingDto": {
+        "type": "object",
+        "properties": {
+          "recruiterId": {
+            "type": "string",
+            "description": "Recruiter ID"
+          },
+          "companyId": {
+            "type": "string",
+            "description": "Company ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Job description"
+          },
+          "jobType": {
+            "type": "string",
+            "description": "Job type",
+            "enum": [
+              "fulltime",
+              "parttime",
+              "contract"
+            ]
+          },
+          "location": {
+            "type": "string",
+            "description": "Job location"
+          },
+          "salaryRange": {
+            "type": "string",
+            "description": "Salary range"
+          },
+          "status": {
+            "type": "string",
+            "description": "Job status",
+            "enum": [
+              "open",
+              "closed",
+              "pending"
+            ]
+          }
+        },
+        "required": [
+          "recruiterId",
+          "companyId",
+          "title",
+          "description",
+          "jobType"
+        ]
+      },
+      "UpdateJobPostingDto": {
+        "type": "object",
+        "properties": {
+          "recruiterId": {
+            "type": "string",
+            "description": "Recruiter ID"
+          },
+          "companyId": {
+            "type": "string",
+            "description": "Company ID"
+          },
+          "title": {
+            "type": "string",
+            "description": "Job title"
+          },
+          "description": {
+            "type": "string",
+            "description": "Job description"
+          },
+          "jobType": {
+            "type": "string",
+            "description": "Job type",
+            "enum": [
+              "fulltime",
+              "parttime",
+              "contract"
+            ]
+          },
+          "location": {
+            "type": "string",
+            "description": "Job location"
+          },
+          "salaryRange": {
+            "type": "string",
+            "description": "Salary range"
+          },
+          "status": {
+            "type": "string",
+            "description": "Job status",
+            "enum": [
+              "open",
+              "closed",
+              "pending"
+            ]
           }
         }
       }

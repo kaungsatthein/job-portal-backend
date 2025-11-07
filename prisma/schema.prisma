@@ -47,6 +47,7 @@ enum ApplicationStatus {
 enum JobStatus {
   open
   closed
+  pending
 }
 
 enum Status {
