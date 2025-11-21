@@ -6,17 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { JobPostingService } from './job-posting.service';
 import { CreateJobPostingDto } from './dto/create-job-posting.dto';
 import { UpdateJobPostingDto } from './dto/update-job-posting.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { RolesGuard } from 'src/common/guards/permission.guard';
+import { UserRole } from '@prisma/client';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @ApiTags('Job Postings')
 @Controller('job-postings')
 export class JobPostingController {
   constructor(private readonly jobPostingService: JobPostingService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter, UserRole.admin)
   @Post()
   @ApiOperation({ summary: 'Create a new job posting' })
   @ApiResponse({ status: 201, description: 'Job created successfully' })
@@ -38,6 +44,8 @@ export class JobPostingController {
     return this.jobPostingService.findOne(id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter, UserRole.admin)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a job posting by ID' })
   @ApiResponse({ status: 200, description: 'Job updated successfully' })
@@ -48,6 +56,8 @@ export class JobPostingController {
     return this.jobPostingService.update(id, updateJobPostingDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter, UserRole.admin)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a job posting by ID' })
   @ApiResponse({ status: 200, description: 'Job deleted successfully' })

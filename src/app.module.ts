@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './module/auth/auth.module';
@@ -8,10 +8,30 @@ import { UserModule } from './module/user/user.module';
 import { IndustryModule } from './module/industry/industry.module';
 import { CompanyModule } from './module/company/company.module';
 import { JobPostingModule } from './module/job-posting/job-posting.module';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 
 @Module({
-  imports: [AuthModule, PrismaModule, UserModule, IndustryModule, CompanyModule, JobPostingModule],
+  imports: [
+    AuthModule,
+    PrismaModule,
+    UserModule,
+    IndustryModule,
+    CompanyModule,
+    JobPostingModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+  ],
 })
 export class AppModule {}

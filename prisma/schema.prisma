@@ -138,7 +138,7 @@ model JobPosting {
   jobType     JobType
   location    String?
   salaryRange String?
-  status      JobStatus @default(open)
+  status      JobStatus @default(pending)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
