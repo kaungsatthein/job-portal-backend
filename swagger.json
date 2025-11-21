@@ -560,6 +560,156 @@
           "Job Postings"
         ]
       }
+    },
+    "/applications": {
+      "post": {
+        "operationId": "ApplicationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Application created"
+          }
+        },
+        "summary": "Create a new application",
+        "tags": [
+          "Applications"
+        ]
+      },
+      "get": {
+        "operationId": "ApplicationController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get all applications",
+        "tags": [
+          "Applications"
+        ]
+      }
+    },
+    "/applications/{id}": {
+      "get": {
+        "operationId": "ApplicationController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get a single application by ID",
+        "tags": [
+          "Applications"
+        ]
+      },
+      "patch": {
+        "operationId": "ApplicationController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Update a full application",
+        "tags": [
+          "Applications"
+        ]
+      },
+      "delete": {
+        "operationId": "ApplicationController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete an application",
+        "tags": [
+          "Applications"
+        ]
+      }
+    },
+    "/applications/{id}/status": {
+      "patch": {
+        "operationId": "ApplicationController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApplicationStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status updated successfully"
+          }
+        },
+        "summary": "Update application status only",
+        "tags": [
+          "Applications"
+        ]
+      }
     }
   },
   "info": {
@@ -751,6 +901,59 @@
             ]
           }
         }
+      },
+      "CreateApplicationDto": {
+        "type": "object",
+        "properties": {
+          "researcherId": {
+            "type": "string",
+            "description": "ID of the researcher applying",
+            "example": "uuid-of-researcher"
+          },
+          "jobId": {
+            "type": "string",
+            "description": "ID of the job posting",
+            "example": "uuid-of-job-posting"
+          },
+          "status": {
+            "type": "string",
+            "description": "Initial status of the application",
+            "enum": [
+              "submitted",
+              "reviewed",
+              "accepted",
+              "rejected"
+            ],
+            "example": "submitted"
+          }
+        },
+        "required": [
+          "researcherId",
+          "jobId"
+        ]
+      },
+      "UpdateApplicationDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateApplicationStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "reviewed",
+              "accepted",
+              "rejected"
+            ],
+            "example": "reviewed",
+            "description": "Update application status"
+          }
+        },
+        "required": [
+          "status"
+        ]
       }
     }
   },

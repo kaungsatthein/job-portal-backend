@@ -11,6 +11,7 @@ import { JobPostingModule } from './module/job-posting/job-posting.module';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { ApplicationModule } from './module/application/application.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
     IndustryModule,
     CompanyModule,
     JobPostingModule,
+    ApplicationModule,
   ],
   controllers: [AppController],
   providers: [

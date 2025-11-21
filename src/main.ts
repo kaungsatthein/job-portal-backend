@@ -8,6 +8,8 @@ import { writeFileSync } from 'fs';
 import { PrismaExceptionFilter } from 'prisma/prisma-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 const jwtTokenName = 'jwt';
 
@@ -73,11 +75,18 @@ const startApplication = async (app: INestApplication<any>) => {
   }
 };
 
+export const configureStaticAssets = (app: NestExpressApplication) => {
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/', // Files can be accessed via http://localhost:3000/uploads/filename
+  });
+};
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   configureCors(app);
   configureGlobalSettings(app);
   configureSwagger(app);
+  configureStaticAssets(app);
   await startApplication(app);
 }
 bootstrap();
