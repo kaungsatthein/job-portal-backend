@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateJobPostingDto } from './dto/create-job-posting.dto';
 import { UpdateJobPostingDto } from './dto/update-job-posting.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { JobStatus } from '@prisma/client';
 
 @Injectable()
 export class JobPostingService {
@@ -15,6 +16,9 @@ export class JobPostingService {
 
   async findAll() {
     return this.prisma.jobPosting.findMany({
+      where: {
+        status: JobStatus.open, // Add this where clause
+      },
       include: {
         recruiter: true,
         company: true,
