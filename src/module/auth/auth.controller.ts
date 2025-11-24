@@ -58,10 +58,6 @@ export class AuthController {
     });
 
     return {
-      token: {
-        accessToken,
-        refreshToken,
-      },
       message: 'User logged in successfully',
     };
   }
@@ -202,7 +198,6 @@ export class AuthController {
       return {
         message: 'Authentication successful',
         user: user,
-        tokens,
       } as any;
     } catch (error) {
       console.error('Google OAuth callback error:', error);
