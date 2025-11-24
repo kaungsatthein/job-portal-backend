@@ -11,7 +11,10 @@ export class AuthService {
     loginUserDto: LoginUserDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userService.findUserByEmail(loginUserDto.email);
-    await this.userService.verifyPassword(user.password, loginUserDto.password);
+    const result = await this.userService.verifyPassword(
+      user.passwordHash,
+      loginUserDto.password,
+    );
     const tokens = await this.userService.generateTokens(user);
     return tokens;
   }
