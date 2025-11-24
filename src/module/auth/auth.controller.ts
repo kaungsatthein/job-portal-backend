@@ -180,15 +180,15 @@ export class AuthController {
       // Set cookies
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
         httpOnly: true,
-        secure: envMode === 'production',
-        sameSite: envMode === 'production' ? 'none' : 'lax',
+        secure: false,
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.cookie(`refresh_token_${envMode}`, tokens.refreshToken, {
         httpOnly: true,
-        secure: envMode === 'production',
-        sameSite: envMode === 'production' ? 'none' : 'lax',
+        secure: false,
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
