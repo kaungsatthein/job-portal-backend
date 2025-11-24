@@ -710,6 +710,38 @@
           "Applications"
         ]
       }
+    },
+    "/upload/single": {
+      "post": {
+        "operationId": "UploadController_uploadSingleFile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "File upload",
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Upload a single file",
+        "tags": [
+          "Upload"
+        ]
+      }
     }
   },
   "info": {

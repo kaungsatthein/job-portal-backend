@@ -1,18 +1,20 @@
 // src/upload/upload.service.ts
 import { Injectable } from '@nestjs/common';
-import { Express } from 'express'; // Need to import this for the type
+import { readdirSync } from 'fs';
 
 @Injectable()
 export class UploadService {
+  private domain = process.env.APP_DOMAIN || 'http://localhost:3000';
   saveFileMetadata(file: Express.Multer.File) {
-    // Logic to save file metadata (e.g., filename, path, original name) to a database
     console.log('File uploaded:', file);
+
+    const fileUrl = `${this.domain}/${file.path}`;
 
     return {
       message: 'File uploaded successfully',
       filename: file.filename,
       originalname: file.originalname,
-      path: file.path, // Only available if you use diskStorage
+      path: fileUrl, // Only available if you use diskStorage
     };
   }
 }

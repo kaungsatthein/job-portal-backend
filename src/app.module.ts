@@ -12,9 +12,14 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ApplicationModule } from './module/application/application.module';
+import { UploadModule } from './module/uploads/upload.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     AuthModule,
     PrismaModule,
     UserModule,
@@ -22,6 +27,7 @@ import { ApplicationModule } from './module/application/application.module';
     CompanyModule,
     JobPostingModule,
     ApplicationModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [

@@ -76,8 +76,8 @@ const startApplication = async (app: INestApplication<any>) => {
 };
 
 export const configureStaticAssets = (app: NestExpressApplication) => {
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', // Files can be accessed via http://localhost:3000/uploads/filename
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/',
   });
 };
 
