@@ -57,7 +57,13 @@ export class AuthController {
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
-    return { message: 'User logged in successfully' };
+    return {
+      token: {
+        accessToken,
+        refreshToken,
+      },
+      message: 'User logged in successfully',
+    };
   }
 
   @Public()
@@ -193,7 +199,11 @@ export class AuthController {
       });
 
       res.redirect(`${frontendUrl}?success=true`);
-      return { message: 'Authentication successful', user: user } as any;
+      return {
+        message: 'Authentication successful',
+        user: user,
+        tokens,
+      } as any;
     } catch (error) {
       console.error('Google OAuth callback error:', error);
       const frontendUrl = process.env.FRONTEND_URL as string;
