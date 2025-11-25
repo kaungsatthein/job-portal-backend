@@ -14,11 +14,9 @@ export class JobPostingService {
     });
   }
 
-  async findAll() {
+  async findAll({ status }: { status?: JobStatus }) {
     return this.prisma.jobPosting.findMany({
-      where: {
-        status: JobStatus.open, // Add this where clause
-      },
+      where: status ? { status } : {},
       include: {
         recruiter: true,
         company: true,
