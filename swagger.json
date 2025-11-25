@@ -829,6 +829,15 @@
           "industryId": {
             "type": "string",
             "description": "Industry ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Job status",
+            "enum": [
+              "open",
+              "closed",
+              "pending"
+            ]
           }
         },
         "required": [
@@ -845,6 +854,15 @@
           "industryId": {
             "type": "string",
             "description": "Industry ID"
+          },
+          "status": {
+            "type": "string",
+            "description": "Job status",
+            "enum": [
+              "open",
+              "closed",
+              "pending"
+            ]
           }
         }
       },

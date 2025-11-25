@@ -1,6 +1,7 @@
 // create-company.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { JobStatus } from '@prisma/client';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCompanyDto {
   @ApiProperty({ description: 'Company name' })
@@ -12,4 +13,9 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   industryId?: string;
+
+  @ApiProperty({ description: 'Job status', enum: JobStatus, required: false })
+  @IsOptional()
+  @IsEnum(JobStatus)
+  status?: JobStatus;
 }
