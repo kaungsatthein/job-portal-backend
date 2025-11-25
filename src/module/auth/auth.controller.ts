@@ -179,22 +179,13 @@ export class AuthController {
   async googleAuthRedirect(
     @Req() req: Request,
     @Res() res: Response,
-  ): Promise<void> {
+  ): Promise<any> {
     try {
       const user = req.user as any;
-
-      // ---------------------------
-      // ✅ Get requested role from state
-      // ---------------------------
       const state = req.query.state
         ? JSON.parse(req.query.state as string)
         : {};
       const requestedRole = state.role || 'researcher';
-
-      // ---------------------------
-      // ✅ Ensure user has multi-role field
-      // Add role only if not already inside roles[]
-      // ---------------------------
       await this.prismaService.user.update({
         where: { id: user.id },
         data: {
@@ -204,34 +195,32 @@ export class AuthController {
         },
       });
 
-      // Optional: refresh user object with new roles
       const updatedUser = await this.prismaService.user.findUnique({
         where: { id: user.id },
       });
-
-      // ---------------------------
-      // Generate tokens after role update
-      // ---------------------------
       const tokens = await this.authService.generateTokens(updatedUser);
 
       const envMode = process.env.NODE_ENV?.trim();
       const frontendUrl = process.env.FRONTEND_URL!;
 
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
-        httpOnly: true,
+        domain: frontendUrl,
+        httpOnly: false,
         secure: envMode === 'production',
-        sameSite: envMode === 'production' ? 'none' : 'lax',
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.cookie(`refresh_token_${envMode}`, tokens.refreshToken, {
-        httpOnly: true,
+        domain: frontendUrl,
+        httpOnly: false,
         secure: envMode === 'production',
-        sameSite: envMode === 'production' ? 'none' : 'lax',
+        sameSite: 'none',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.redirect(`${frontendUrl}?success=true`);
+      return { message: 'User logged into Google successfully' };
     } catch (error) {
       console.error('Google OAuth callback error:', error);
       const frontendUrl = process.env.FRONTEND_URL!;
