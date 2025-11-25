@@ -7,7 +7,8 @@ import {
   IsUrl,
   IsDateString,
 } from 'class-validator';
-import { UserRole } from '@prisma/client';
+import { Status, UserRole } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class BaseUserDto {
   @IsEmail()
@@ -36,4 +37,8 @@ export class BaseUserDto {
   @IsString()
   @IsOptional()
   nrc?: string;
+
+  @IsOptional()
+  @IsEnum(Status)
+  status?: Status;
 }

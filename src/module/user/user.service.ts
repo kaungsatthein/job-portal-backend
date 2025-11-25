@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { GetUsersQueryDto } from './dto/get-users-query.dto';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 
 @Injectable()
 export class UserService {
@@ -201,5 +202,12 @@ export class UserService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  updateStatus(id: string, dto: UpdateUserStatusDto) {
+    return this.prismaService.user.update({
+      where: { id },
+      data: { status: dto.status },
+    });
   }
 }

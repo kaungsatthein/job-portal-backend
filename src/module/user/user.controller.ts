@@ -1,7 +1,8 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetUsersQueryDto } from './dto/get-users-query.dto';
+import { UpdateUserStatusDto } from './dto/update-user-status.dto';
 
 @Controller('user')
 export class UserController {
@@ -11,5 +12,12 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'List of users with pagination' })
   async getAllUsers(@Query() query: GetUsersQueryDto) {
     return this.userService.getAllUsers(query);
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update User' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  updateStatus(@Param('id') id: string, @Body() dto: UpdateUserStatusDto) {
+    return this.userService.updateStatus(id, dto);
   }
 }

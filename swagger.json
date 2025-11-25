@@ -220,6 +220,40 @@
         ]
       }
     },
+    "/user/{id}/status": {
+      "patch": {
+        "operationId": "UserController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          }
+        },
+        "summary": "Update User",
+        "tags": [
+          "User"
+        ]
+      }
+    },
     "/industry": {
       "post": {
         "operationId": "IndustryController_create",
@@ -870,6 +904,27 @@
         "required": [
           "email",
           "password"
+        ]
+      },
+      "UpdateUserStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "INACTIVE",
+              "PENDING",
+              "APPROVED",
+              "REJECTED",
+              "DELETE"
+            ],
+            "example": "DELETE",
+            "description": "Update application status"
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "CreateIndustryDto": {
