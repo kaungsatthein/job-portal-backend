@@ -538,7 +538,6 @@
             "name": "status",
             "required": false,
             "in": "query",
-            "description": "Filter job postings by status",
             "schema": {
               "enum": [
                 "open",
@@ -547,14 +546,72 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by title, company name or location",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "jobType",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "fulltime",
+                "parttime",
+                "contract"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by createdAt >= startDate (YYYY-MM-DD)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "Filter by createdAt <= endDate (YYYY-MM-DD)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 10,
+              "type": "number"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of job postings"
+            "description": ""
           }
         },
-        "summary": "Get all job postings",
+        "summary": "Get all job postings with filters & pagination",
         "tags": [
           "Job Postings"
         ]

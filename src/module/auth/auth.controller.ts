@@ -16,11 +16,15 @@ import type { Response, Request } from 'express';
 import { Public } from 'src/common/decorators/public';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
+import { PrismaService } from '../prisma/prisma.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   @Public()
   @Post('login')
@@ -178,12 +182,41 @@ export class AuthController {
   ): Promise<void> {
     try {
       const user = req.user as any;
-      const tokens = await this.authService.generateTokens(user);
+
+      // ---------------------------
+      // ✅ Get requested role from state
+      // ---------------------------
+      const state = req.query.state
+        ? JSON.parse(req.query.state as string)
+        : {};
+      const requestedRole = state.role || 'researcher';
+
+      // ---------------------------
+      // ✅ Ensure user has multi-role field
+      // Add role only if not already inside roles[]
+      // ---------------------------
+      await this.prismaService.user.update({
+        where: { id: user.id },
+        data: {
+          role: {
+            push: requestedRole, // Prisma array push
+          },
+        },
+      });
+
+      // Optional: refresh user object with new roles
+      const updatedUser = await this.prismaService.user.findUnique({
+        where: { id: user.id },
+      });
+
+      // ---------------------------
+      // Generate tokens after role update
+      // ---------------------------
+      const tokens = await this.authService.generateTokens(updatedUser);
 
       const envMode = process.env.NODE_ENV?.trim();
-      const frontendUrl = process.env.FRONTEND_URL as string;
+      const frontendUrl = process.env.FRONTEND_URL!;
 
-      // Set cookies
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
         httpOnly: true,
         secure: envMode === 'production',
@@ -199,16 +232,10 @@ export class AuthController {
       });
 
       res.redirect(`${frontendUrl}?success=true`);
-      return {
-        message: 'Authentication successful',
-        user: user,
-        tokens,
-      } as any;
     } catch (error) {
       console.error('Google OAuth callback error:', error);
-      const frontendUrl = process.env.FRONTEND_URL as string;
+      const frontendUrl = process.env.FRONTEND_URL!;
       res.redirect(`${frontendUrl}?success=false`);
-      return { message: 'Authentication failed', error: error } as any;
     }
   }
 

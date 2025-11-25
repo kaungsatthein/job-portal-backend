@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateJobPostingDto } from './dto/create-job-posting.dto';
 import { UpdateJobPostingDto } from './dto/update-job-posting.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { JobStatus } from '@prisma/client';
+import { JobStatus, JobType } from '@prisma/client';
 
 @Injectable()
 export class JobPostingService {
@@ -14,15 +14,81 @@ export class JobPostingService {
     });
   }
 
-  async findAll({ status }: { status?: JobStatus }) {
-    return this.prisma.jobPosting.findMany({
-      where: status ? { status } : {},
-      include: {
-        recruiter: true,
-        company: true,
-        applications: true,
-      },
-    });
+  async findAll({
+    status,
+    search,
+    jobType,
+    startDate,
+    endDate,
+    page,
+    limit,
+  }: {
+    status?: JobStatus;
+    search?: string;
+    jobType?: JobType;
+    startDate?: string;
+    endDate?: string;
+    page: number;
+    limit: number;
+  }) {
+    const where: any = {};
+
+    // status filter
+    if (status) where.status = status;
+
+    // jobType filter
+    if (jobType) where.jobType = jobType;
+
+    // date filter
+    if (startDate || endDate) {
+      where.createdAt = {};
+
+      if (startDate) {
+        where.createdAt.gte = new Date(startDate);
+      }
+
+      if (endDate) {
+        where.createdAt.lte = new Date(endDate);
+      }
+    }
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { location: { contains: search, mode: 'insensitive' } },
+        {
+          company: {
+            name: { contains: search, mode: 'insensitive' },
+          },
+        },
+      ];
+    }
+
+    // pagination
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.jobPosting.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          recruiter: true,
+          company: true,
+          applications: true,
+        },
+      }),
+      this.prisma.jobPosting.count({ where }),
+    ]);
+
+    return {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      data,
+    };
   }
 
   async findOne(id: string) {

@@ -55,16 +55,16 @@ enum Status {
 // MODELS
 // --------------------
 model User {
-  id           String    @id @default(uuid())
-  email        String    @unique
+  id           String     @id @default(uuid())
+  email        String     @unique
   passwordHash String?
   name         String
-  role         UserRole  @default(researcher)
+  role         UserRole[] @default([researcher])
   companyId    String? // changed from Int
   resumeUrl    String?
   birthDate    DateTime?
   nrc          String?
-  status       Status    @default(ACTIVE)
+  status       Status     @default(ACTIVE)
 
   // Google OAuth fields
   google_id    String? @unique

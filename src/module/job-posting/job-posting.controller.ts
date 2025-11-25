@@ -14,7 +14,7 @@ import { CreateJobPostingDto } from './dto/create-job-posting.dto';
 import { UpdateJobPostingDto } from './dto/update-job-posting.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { RolesGuard } from 'src/common/guards/permission.guard';
-import { JobStatus, UserRole } from '@prisma/client';
+import { JobStatus, JobType, UserRole } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
 
 @ApiTags('Job Postings')
@@ -32,16 +32,44 @@ export class JobPostingController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all job postings' })
+  @ApiOperation({ summary: 'Get all job postings with filters & pagination' })
+  @ApiQuery({ name: 'status', required: false, enum: JobStatus })
   @ApiQuery({
-    name: 'status',
+    name: 'search',
     required: false,
-    enum: JobStatus,
-    description: 'Filter job postings by status',
+    description: 'Search by title, company name or location',
   })
-  @ApiResponse({ status: 200, description: 'List of job postings' })
-  findAll(@Query('status') status?: JobStatus) {
-    return this.jobPostingService.findAll({ status });
+  @ApiQuery({ name: 'jobType', required: false, enum: JobType })
+  @ApiQuery({
+    name: 'startDate',
+    required: false,
+    description: 'Filter by createdAt >= startDate (YYYY-MM-DD)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: false,
+    description: 'Filter by createdAt <= endDate (YYYY-MM-DD)',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  findAll(
+    @Query('status') status?: JobStatus,
+    @Query('search') search?: string,
+    @Query('jobType') jobType?: JobType,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.jobPostingService.findAll({
+      status,
+      search,
+      jobType,
+      startDate,
+      endDate,
+      page,
+      limit,
+    });
   }
 
   @Get(':id')

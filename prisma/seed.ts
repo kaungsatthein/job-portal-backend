@@ -47,13 +47,13 @@ async function main() {
   const recruiterPwd = await bcrypt.hash('Recruiter#123', 10);
   const researcherPwd = await bcrypt.hash('Researcher#123', 10);
 
-  // 4️⃣ Users
+  // 4️⃣ Users with roles as array
   const admin = await prisma.user.create({
     data: {
       email: 'admin@example.com',
       passwordHash: adminPwd,
       name: 'System Admin',
-      role: UserRole.admin,
+      role: [UserRole.admin], // array now
       status: Status.ACTIVE,
       provider: 'local',
       emailVerified: true,
@@ -65,7 +65,7 @@ async function main() {
       email: 'recruiter@acme.com',
       passwordHash: recruiterPwd,
       name: 'Alice Recruiter',
-      role: UserRole.recruiter,
+      role: [UserRole.recruiter], // array
       status: Status.ACTIVE,
       provider: 'local',
       emailVerified: true,
@@ -78,7 +78,7 @@ async function main() {
       email: 'researcher.local@example.com',
       passwordHash: researcherPwd,
       name: 'Bob Researcher',
-      role: UserRole.researcher,
+      role: [UserRole.researcher], // array
       status: Status.ACTIVE,
       provider: 'local',
       emailVerified: true,
@@ -91,7 +91,7 @@ async function main() {
       google_id: 'google-123',
       google_email: 'researcher.google@example.com',
       name: 'Gina Researcher',
-      role: UserRole.researcher,
+      role: [UserRole.researcher], // array
       status: Status.ACTIVE,
       avatar_url: 'https://picsum.photos/200',
       provider: 'google',

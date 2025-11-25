@@ -128,7 +128,7 @@ export class UserService {
     firstName: string;
     lastName: string;
     picture?: string;
-    role?: UserRole;
+    role?: UserRole; // optional single role
   }): Promise<User> {
     const { googleId, email, firstName, lastName, picture, role } =
       googleUserData;
@@ -142,13 +142,13 @@ export class UserService {
       data: {
         google_id: googleId,
         google_email: email,
-        email, // ✅ Add this line — Prisma requires it
+        email,
         name: `${firstName} ${lastName}`,
         avatar_url: picture,
         provider: 'google',
         emailVerified: true,
-        role: role || 'researcher', // fallback to researcher,
-        status: 'ACTIVE', // or Status.ACTIVE if it’s an enum
+        role: [role ?? UserRole.researcher], // ✅ wrap in array, default to researcher
+        status: Status.ACTIVE, // ✅ use enum instead of string
       },
     });
   }
