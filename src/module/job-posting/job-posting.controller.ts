@@ -12,7 +12,7 @@ import {
 import { JobPostingService } from './job-posting.service';
 import { CreateJobPostingDto } from './dto/create-job-posting.dto';
 import { UpdateJobPostingDto } from './dto/update-job-posting.dto';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { RolesGuard } from 'src/common/guards/permission.guard';
 import { JobStatus, UserRole } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -33,6 +33,12 @@ export class JobPostingController {
 
   @Get()
   @ApiOperation({ summary: 'Get all job postings' })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    enum: JobStatus,
+    description: 'Filter job postings by status',
+  })
   @ApiResponse({ status: 200, description: 'List of job postings' })
   findAll(@Query('status') status?: JobStatus) {
     return this.jobPostingService.findAll({ status });

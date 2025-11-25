@@ -426,9 +426,15 @@
         "parameters": [
           {
             "name": "status",
-            "required": true,
+            "required": false,
             "in": "query",
+            "description": "Filter job postings by status",
             "schema": {
+              "enum": [
+                "open",
+                "closed",
+                "pending"
+              ],
               "type": "string"
             }
           }
