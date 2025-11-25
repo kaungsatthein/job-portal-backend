@@ -4,6 +4,7 @@ import { Status, User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { GetUsersQueryDto } from './dto/get-users-query.dto';
 
 @Injectable()
 export class UserService {
@@ -164,5 +165,41 @@ export class UserService {
     }
 
     return user;
+  }
+
+  async getAllUsers(query: GetUsersQueryDto) {
+    const { page = 1, limit = 10, search, role, status } = query;
+    const skip = (page - 1) * limit;
+
+    // Build where condition dynamically
+    const where: any = {};
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+    if (role) where.role = role;
+    if (status) where.status = status;
+
+    const [data, total] = await Promise.all([
+      this.prismaService.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prismaService.user.count({ where }),
+    ]);
+
+    return {
+      data,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 }

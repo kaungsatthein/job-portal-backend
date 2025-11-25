@@ -144,6 +144,82 @@
         ]
       }
     },
+    "/user": {
+      "get": {
+        "operationId": "UserController_getAllUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "default": 10,
+              "type": "number"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name or email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "description": "Filter by role",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "admin",
+                "recruiter",
+                "researcher"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "INACTIVE",
+                "PENDING",
+                "APPROVED",
+                "REJECTED",
+                "DELETE"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users with pagination"
+          }
+        },
+        "summary": "Get all users with pagination & search",
+        "tags": [
+          "User"
+        ]
+      }
+    },
     "/industry": {
       "post": {
         "operationId": "IndustryController_create",
