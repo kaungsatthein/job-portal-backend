@@ -17,6 +17,7 @@ import { Public } from 'src/common/decorators/public';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
+import { User } from '@prisma/client';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -238,7 +239,7 @@ export class AuthController {
       throw new UnauthorizedException('Not authenticated');
     }
 
-    const user = req.user as any;
+    const user = req.user as User;
     return {
       id: user.id,
       email: user.email,
@@ -246,6 +247,7 @@ export class AuthController {
       avatar_url: user.avatar_url,
       provider: user.provider,
       role: user.role,
+      loginCount: user.loginCount,
     };
   }
 }

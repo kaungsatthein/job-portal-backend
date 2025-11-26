@@ -52,13 +52,12 @@ export class JobPostingService {
       if (endDate) {
         where.createdAt.lte = new Date(endDate);
       }
-
-      if (location) {
-        where.location = {
-          contains: location,
-          mode: 'insensitive',
-        };
-      }
+    }
+    if (location) {
+      where.location = {
+        contains: location,
+        mode: 'insensitive',
+      };
     }
 
     if (search) {
@@ -89,7 +88,6 @@ export class JobPostingService {
       }),
       this.prisma.jobPosting.count({ where }),
     ]);
-
     return {
       page,
       limit,

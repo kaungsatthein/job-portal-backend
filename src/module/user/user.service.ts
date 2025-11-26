@@ -188,6 +188,11 @@ export class UserService {
         where,
         skip,
         take: limit,
+        include: {
+          jobPosts: true,
+          company: true,
+          applications: true,
+        },
         orderBy: { createdAt: 'desc' },
       }),
       this.prismaService.user.count({ where }),
