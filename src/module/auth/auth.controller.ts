@@ -202,20 +202,21 @@ export class AuthController {
 
       const envMode = process.env.NODE_ENV?.trim();
       const frontendUrl = process.env.FRONTEND_URL!;
+      console.log('frontendUrl', frontendUrl);
 
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
-        domain: frontendUrl,
+        // domain: frontendUrl,
         httpOnly: false,
         secure: envMode === 'production',
-        sameSite: 'none',
+        sameSite: envMode === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000,
       });
 
       res.cookie(`refresh_token_${envMode}`, tokens.refreshToken, {
-        domain: frontendUrl,
+        // domain: frontendUrl,
         httpOnly: false,
         secure: envMode === 'production',
-        sameSite: 'none',
+        sameSite: envMode === 'production' ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
