@@ -16,6 +16,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { RolesGuard } from 'src/common/guards/permission.guard';
 import { JobStatus, JobType, UserRole } from '@prisma/client';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { Public } from 'src/common/decorators/public';
 
 @ApiTags('Job Postings')
 @Controller('job-postings')
@@ -31,6 +32,7 @@ export class JobPostingController {
     return this.jobPostingService.create(createJobPostingDto);
   }
 
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all job postings with filters & pagination' })
   @ApiQuery({ name: 'status', required: false, enum: JobStatus })
@@ -79,6 +81,7 @@ export class JobPostingController {
     });
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get a job posting by ID' })
   @ApiResponse({ status: 200, description: 'Job posting found' })
