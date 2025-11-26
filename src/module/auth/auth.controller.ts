@@ -164,37 +164,38 @@ export class AuthController {
   @Public()
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Google OAuth callback' })
-  @ApiQuery({
-    name: 'role',
-    required: false,
-    description:
-      'User role sent from frontend during OAuth initiation. Defaults to researcher.',
-    enum: ['admin', 'recruiter', 'researcher'],
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Google OAuth callback processed',
-  })
-  async googleAuthRedirect(
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<any> {
+  async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     try {
       const user = req.user as any;
       const state = req.query.state
         ? JSON.parse(req.query.state as string)
         : {};
+
       const requestedRole = state.role || 'researcher';
+
+      // Fetch current roles
+      const currentUser = await this.prismaService.user.findUnique({
+        where: { id: user.id },
+        select: { role: true },
+      });
+
+      const currentRoles = currentUser?.role || [];
+
+      // Prepare updated roles
+      const updatedRoles = currentRoles.includes(requestedRole)
+        ? currentRoles
+        : [...currentRoles, requestedRole];
+
+      // Update user: roles + login count
       await this.prismaService.user.update({
         where: { id: user.id },
         data: {
-          role: {
-            push: requestedRole, // Prisma array push
-          },
+          role: updatedRoles,
+          loginCount: { increment: 1 },
         },
       });
 
+      // Generate tokens etc...
       const updatedUser = await this.prismaService.user.findUnique({
         where: { id: user.id },
       });
@@ -202,10 +203,8 @@ export class AuthController {
 
       const envMode = process.env.NODE_ENV?.trim();
       const frontendUrl = process.env.FRONTEND_URL!;
-      console.log('frontendUrl', frontendUrl);
 
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
-        // domain: frontendUrl,
         httpOnly: false,
         secure: envMode === 'production',
         sameSite: envMode === 'production' ? 'none' : 'lax',
@@ -213,7 +212,6 @@ export class AuthController {
       });
 
       res.cookie(`refresh_token_${envMode}`, tokens.refreshToken, {
-        // domain: frontendUrl,
         httpOnly: false,
         secure: envMode === 'production',
         sameSite: envMode === 'production' ? 'none' : 'lax',

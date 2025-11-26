@@ -37,7 +37,12 @@ export class JobPostingController {
   @ApiQuery({
     name: 'search',
     required: false,
-    description: 'Search by title, company name or location',
+    description: 'Search by title, company name',
+  })
+  @ApiQuery({
+    name: 'location',
+    required: false,
+    description: 'Search by location',
   })
   @ApiQuery({ name: 'jobType', required: false, enum: JobType })
   @ApiQuery({
@@ -55,6 +60,7 @@ export class JobPostingController {
   findAll(
     @Query('status') status?: JobStatus,
     @Query('search') search?: string,
+    @Query('location') location?: string,
     @Query('jobType') jobType?: JobType,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
@@ -64,6 +70,7 @@ export class JobPostingController {
     return this.jobPostingService.findAll({
       status,
       search,
+      location,
       jobType,
       startDate,
       endDate,

@@ -17,6 +17,7 @@ export class JobPostingService {
   async findAll({
     status,
     search,
+    location,
     jobType,
     startDate,
     endDate,
@@ -25,6 +26,7 @@ export class JobPostingService {
   }: {
     status?: JobStatus;
     search?: string;
+    location?: string;
     jobType?: JobType;
     startDate?: string;
     endDate?: string;
@@ -50,12 +52,18 @@ export class JobPostingService {
       if (endDate) {
         where.createdAt.lte = new Date(endDate);
       }
+
+      if (location) {
+        where.location = {
+          contains: location,
+          mode: 'insensitive',
+        };
+      }
     }
 
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
         {
           company: {
             name: { contains: search, mode: 'insensitive' },

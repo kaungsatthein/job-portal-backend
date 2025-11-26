@@ -102,28 +102,12 @@
     "/auth/google/callback": {
       "get": {
         "operationId": "AuthController_googleAuthRedirect",
-        "parameters": [
-          {
-            "name": "role",
-            "required": false,
-            "in": "query",
-            "description": "User role sent from frontend during OAuth initiation. Defaults to researcher.",
-            "schema": {
-              "enum": [
-                "admin",
-                "recruiter",
-                "researcher"
-              ],
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Google OAuth callback processed"
+            "description": ""
           }
         },
-        "summary": "Google OAuth callback",
         "tags": [
           "Auth"
         ]
@@ -551,7 +535,16 @@
             "name": "search",
             "required": false,
             "in": "query",
-            "description": "Search by title, company name or location",
+            "description": "Search by title, company name",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "location",
+            "required": false,
+            "in": "query",
+            "description": "Search by location",
             "schema": {
               "type": "string"
             }
