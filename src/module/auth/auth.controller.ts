@@ -41,24 +41,22 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.login(loginUserDto);
     const envMode = process.env.NODE_ENV?.trim();
+    console.log(
+      'process.env.FRONTEND_PORTAL_PROD_URL',
+      process.env.FRONTEND_PORTAL_PROD_URL,
+    );
 
     res.cookie(`portal_access_token_${envMode}`, accessToken, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain:
-        envMode === 'production'
-          ? process.env.FRONTEND_PORTAL_PROD_URL
-          : undefined,
+      domain: envMode === 'production' ? 'localhost' : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
     res.cookie(`portal_refresh_token_${envMode}`, refreshToken, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain:
-        envMode === 'production'
-          ? process.env.FRONTEND_PORTAL_PROD_URL
-          : undefined,
+      domain: envMode === 'production' ? 'localhost' : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
@@ -86,20 +84,14 @@ export class AuthController {
     res.clearCookie(`portal_access_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain:
-        envMode === 'production'
-          ? process.env.FRONTEND_PORTAL_PROD_URL
-          : undefined,
+      domain: envMode === 'production' ? 'localhost' : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
     res.clearCookie(`portal_refresh_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain:
-        envMode === 'production'
-          ? process.env.FRONTEND_PORTAL_PROD_URL
-          : undefined,
+      domain: envMode === 'production' ? 'localhost' : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
@@ -121,20 +113,14 @@ export class AuthController {
     res.clearCookie(`access_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain:
-        envMode === 'production'
-          ? process.env.FRONTEND_PUBLIC_PROD_URL
-          : undefined,
+      domain: envMode === 'production' ? 'localhost' : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
     res.clearCookie(`refresh_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain:
-        envMode === 'production'
-          ? process.env.FRONTEND_PUBLIC_PROD_URL
-          : undefined,
+      domain: envMode === 'production' ? 'localhost' : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
