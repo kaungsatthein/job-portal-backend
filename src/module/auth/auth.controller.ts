@@ -201,6 +201,7 @@ export class AuthController {
 
       res.cookie(`access_token_${envMode}`, tokens.accessToken, {
         httpOnly: false,
+        domain: envMode === 'production' ? this.domain : undefined,
         secure: envMode === 'production',
         sameSite: envMode === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000,
@@ -208,6 +209,7 @@ export class AuthController {
 
       res.cookie(`refresh_token_${envMode}`, tokens.refreshToken, {
         httpOnly: false,
+        domain: envMode === 'production' ? this.domain : undefined,
         secure: envMode === 'production',
         sameSite: envMode === 'production' ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
