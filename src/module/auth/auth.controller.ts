@@ -18,14 +18,22 @@ import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
+import { getCookieDomain } from 'src/common/utils/helper';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+  private readonly domain?: string;
   constructor(
     private readonly authService: AuthService,
     private readonly prismaService: PrismaService,
-  ) {}
+  ) {
+    const envMode = process.env.NODE_ENV?.trim();
+    this.domain =
+      envMode === 'production'
+        ? getCookieDomain(process.env.FRONTEND_PORTAL_PROD_URL)
+        : undefined;
+  }
 
   @Public()
   @Post('login')
@@ -49,14 +57,14 @@ export class AuthController {
     res.cookie(`portal_access_token_${envMode}`, accessToken, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain: envMode === 'production' ? 'localhost' : undefined,
+      domain: envMode === 'production' ? this.domain : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
     res.cookie(`portal_refresh_token_${envMode}`, refreshToken, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain: envMode === 'production' ? 'localhost' : undefined,
+      domain: envMode === 'production' ? this.domain : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
@@ -84,14 +92,14 @@ export class AuthController {
     res.clearCookie(`portal_access_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain: envMode === 'production' ? 'localhost' : undefined,
+      domain: envMode === 'production' ? this.domain : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
     res.clearCookie(`portal_refresh_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain: envMode === 'production' ? 'localhost' : undefined,
+      domain: envMode === 'production' ? this.domain : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
@@ -113,14 +121,14 @@ export class AuthController {
     res.clearCookie(`access_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain: envMode === 'production' ? 'localhost' : undefined,
+      domain: envMode === 'production' ? this.domain : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
     res.clearCookie(`refresh_token_${envMode}`, {
       httpOnly: true,
       secure: envMode === 'production',
-      domain: envMode === 'production' ? 'localhost' : undefined,
+      domain: envMode === 'production' ? this.domain : undefined,
       sameSite: envMode === 'production' ? 'none' : 'lax',
     });
 
