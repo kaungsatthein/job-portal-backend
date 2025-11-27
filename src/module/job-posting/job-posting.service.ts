@@ -111,13 +111,45 @@ export class JobPostingService {
   }
 
   async update(id: string, updateJobPostingDto: UpdateJobPostingDto) {
-    const job = await this.prisma.jobPosting.findUnique({ where: { id } });
+    const job = await this.prisma.jobPosting.findUnique({
+      where: { id },
+      include: {
+        recruiter: true, // to notify the recruiter
+        applications: true, // to notify researchers who applied
+      },
+    });
+
     if (!job) throw new NotFoundException(`JobPosting with ID ${id} not found`);
 
-    return this.prisma.jobPosting.update({
+    const updatedJob = await this.prisma.jobPosting.update({
       where: { id },
       data: updateJobPostingDto,
     });
+
+    // ✅ Notify the recruiter about the update
+    await this.prisma.notification.create({
+      data: {
+        userId: job.recruiterId,
+        message: `Your job posting "${job.title}" has been updated.`,
+        type: 'job',
+        readAt: null,
+      },
+    });
+
+    // ✅ Optionally notify all applicants about the update
+    const applicantNotifications = job.applications.map((app) => ({
+      userId: app.researcherId,
+      message: `The job "${job.title}" you applied for has been updated.`,
+      type: 'job',
+    }));
+
+    if (applicantNotifications.length > 0) {
+      await this.prisma.notification.createMany({
+        data: applicantNotifications,
+      });
+    }
+
+    return updatedJob;
   }
 
   async remove(id: string) {

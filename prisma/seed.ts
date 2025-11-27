@@ -159,20 +159,23 @@ async function main() {
     data: [
       {
         userId: recruiter.id,
+        type: 'application_received',
         message: `New application received for "${job1.title}"`,
         applicationId: app1.id,
-        isRead: false,
+        readAt: null,
       },
       {
         userId: researcherGoogle.id,
+        type: 'application_reviewed',
         message: `Your application for "${job2.title}" was reviewed`,
         applicationId: app2.id,
-        isRead: false,
+        readAt: null,
       },
       {
         userId: admin.id,
+        type: 'system',
         message: 'System seed completed successfully. Admin privileges active.',
-        isRead: true,
+        readAt: new Date(),
       },
     ],
   });

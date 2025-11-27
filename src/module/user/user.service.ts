@@ -173,7 +173,6 @@ export class UserService {
     const { page = 1, limit = 10, search, role, status } = query;
     const skip = (page - 1) * limit;
 
-    // Build where condition dynamically
     const where: any = {};
     if (search) {
       where.OR = [
@@ -231,7 +230,7 @@ export class UserService {
             job: {
               include: {
                 company: true,
-                recruiter: true, // include recruiter info
+                recruiter: true,
               },
             },
           },
@@ -254,10 +253,20 @@ export class UserService {
     id: string,
     data: Partial<UpdateUserDto & { role: UserRole }>,
   ): Promise<User> {
-    return this.prismaService.user.update({
+    const updated = await this.prismaService.user.update({
       where: { id },
       data,
     });
+
+    await this.prismaService.notification.create({
+      data: {
+        userId: id,
+        message: 'Your profile has been updated successfully',
+        type: 'profile',
+      },
+    });
+
+    return updated;
   }
 
   updateStatus(id: string, dto: UpdateUserStatusDto) {
@@ -281,7 +290,7 @@ export class UserService {
     return this.prismaService.user.findUnique({
       where: { id: userId },
       select: {
-        savedJobs: true, // Only return saved jobs
+        savedJobs: true,
       },
     });
   }

@@ -14,6 +14,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { ApplicationModule } from './module/application/application.module';
 import { UploadModule } from './module/uploads/upload.module';
 import { ConfigModule } from '@nestjs/config';
+import { NotificationModule } from './module/notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ConfigModule } from '@nestjs/config';
     JobPostingModule,
     ApplicationModule,
     UploadModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

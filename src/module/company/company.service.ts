@@ -8,9 +8,27 @@ export class CompanyService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateCompanyDto) {
-    return this.prisma.company.create({
+    const company = await this.prisma.company.create({
       data: createCompanyDto,
     });
+
+    // Notify all admins that a new company was created
+    const admins = await this.prisma.user.findMany({
+      where: { role: 'admin', status: { not: 'DELETE' } },
+    });
+
+    const notifications = admins.map((admin) => ({
+      userId: admin.id,
+      message: `A new company "${company.name}" has been created.`,
+      type: 'company', // or NotificationType.COMPANY if using enum
+      isRead: false,
+    }));
+
+    if (notifications.length > 0) {
+      await this.prisma.notification.createMany({ data: notifications });
+    }
+
+    return company;
   }
 
   async findAll() {
@@ -35,15 +53,51 @@ export class CompanyService {
   }
 
   async update(id: string, updateCompanyDto: UpdateCompanyDto) {
-    return this.prisma.company.update({
+    const company = await this.prisma.company.update({
       where: { id },
       data: updateCompanyDto,
     });
+
+    // Notify recruiters of this company that the company info was updated
+    const recruiters = await this.prisma.user.findMany({
+      where: { companyId: id, status: { not: 'DELETE' } },
+    });
+
+    const notifications = recruiters.map((rec) => ({
+      userId: rec.id,
+      message: `Company "${company.name}" information has been updated.`,
+      type: 'company',
+      isRead: false,
+    }));
+
+    if (notifications.length > 0) {
+      await this.prisma.notification.createMany({ data: notifications });
+    }
+
+    return company;
   }
 
   async remove(id: string) {
-    return this.prisma.company.delete({
+    const company = await this.prisma.company.delete({
       where: { id },
     });
+
+    // Notify all admins that a company was deleted
+    const admins = await this.prisma.user.findMany({
+      where: { role: 'admin', status: { not: 'DELETE' } },
+    });
+
+    const notifications = admins.map((admin) => ({
+      userId: admin.id,
+      message: `Company "${company.name}" has been deleted.`,
+      type: 'company',
+      isRead: false,
+    }));
+
+    if (notifications.length > 0) {
+      await this.prisma.notification.createMany({ data: notifications });
+    }
+
+    return company;
   }
 }
