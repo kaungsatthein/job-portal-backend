@@ -263,6 +263,89 @@
         ]
       }
     },
+    "/user/saved-jobs": {
+      "get": {
+        "operationId": "UserController_getSavedJobs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of saved jobs"
+          }
+        },
+        "summary": "Get all saved jobs for the current user",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/user/saved-jobs/{jobId}": {
+      "get": {
+        "operationId": "UserController_getSavedJobDetail",
+        "parameters": [
+          {
+            "name": "jobId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saved job details"
+          }
+        },
+        "summary": "Get details of a saved job",
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "operationId": "UserController_saveJob",
+        "parameters": [
+          {
+            "name": "jobId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job saved successfully"
+          }
+        },
+        "summary": "Save a job for the current user",
+        "tags": [
+          "User"
+        ]
+      },
+      "delete": {
+        "operationId": "UserController_removeSavedJob",
+        "parameters": [
+          {
+            "name": "jobId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job removed successfully"
+          }
+        },
+        "summary": "Remove a saved job for the current user",
+        "tags": [
+          "User"
+        ]
+      }
+    },
     "/industry": {
       "post": {
         "operationId": "IndustryController_create",

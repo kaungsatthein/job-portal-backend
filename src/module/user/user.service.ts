@@ -241,4 +241,56 @@ export class UserService {
       data: { status: dto.status },
     });
   }
+
+  async saveJob(userId: string, jobId: string) {
+    return this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        savedJobs: { connect: { id: jobId } },
+      },
+      include: { savedJobs: true },
+    });
+  }
+
+  async getSavedJobs(userId: string) {
+    return this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: {
+        savedJobs: true, // Only return saved jobs
+      },
+    });
+  }
+
+  async getSavedJobDetail(userId: string, jobId: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: {
+        savedJobs: {
+          where: { id: jobId },
+          include: {
+            company: true,
+            recruiter: true,
+            applications: true,
+          },
+        },
+      },
+    });
+
+    const job = user?.savedJobs[0];
+    if (!job) {
+      throw new Error('Saved job not found for this user');
+    }
+
+    return job;
+  }
+
+  async removeSavedJob(userId: string, jobId: string) {
+    return this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        savedJobs: { disconnect: { id: jobId } },
+      },
+      include: { savedJobs: true },
+    });
+  }
 }

@@ -1,6 +1,5 @@
 // src/upload/upload.service.ts
 import { Injectable } from '@nestjs/common';
-import { readdirSync } from 'fs';
 
 @Injectable()
 export class UploadService {

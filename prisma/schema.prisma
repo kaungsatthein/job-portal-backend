@@ -60,19 +60,17 @@ model User {
   passwordHash String?
   name         String
   role         UserRole  @default(researcher)
-  companyId    String? // changed from Int
+  companyId    String?
   resumeUrl    String?
   birthDate    DateTime?
   nrc          String?
   status       Status    @default(ACTIVE)
 
-  //add property
   headline    String?
   phoneNumber String?
   location    String?
   about       String?
 
-  // Google OAuth fields
   google_id    String? @unique
   google_email String?
   avatar_url   String?
@@ -90,6 +88,9 @@ model User {
   applications  Application[]  @relation("ResearcherApps")
   notifications Notification[]
   Account       Account[]
+
+  // ✅ Saved jobs many-to-many relation
+  savedJobs JobPosting[] @relation("SavedJobs")
 }
 
 model Account {
@@ -146,6 +147,9 @@ model JobPosting {
   recruiter    User          @relation("RecruiterJobs", fields: [recruiterId], references: [id])
   company      Company       @relation(fields: [companyId], references: [id])
   applications Application[]
+
+  // ✅ Saved by users many-to-many relation
+  savedBy User[] @relation("SavedJobs")
 }
 
 model Application {
