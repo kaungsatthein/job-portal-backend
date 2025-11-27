@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  Req,
 } from '@nestjs/common';
 import { JobPostingService } from './job-posting.service';
 import { CreateJobPostingDto } from './dto/create-job-posting.dto';
@@ -60,6 +61,7 @@ export class JobPostingController {
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   findAll(
+    @Req() req: any,
     @Query('status') status?: JobStatus,
     @Query('search') search?: string,
     @Query('location') location?: string,
@@ -69,7 +71,8 @@ export class JobPostingController {
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    return this.jobPostingService.findAll({
+    const currentUserId = req.user?.id;
+    return this.jobPostingService.findAll(currentUserId, {
       status,
       search,
       location,
