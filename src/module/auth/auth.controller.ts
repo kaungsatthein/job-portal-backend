@@ -176,24 +176,20 @@ export class AuthController {
 
       const requestedRole = state.role || 'researcher';
 
-      // Fetch current roles
+      // Fetch current user role
       const currentUser = await this.prismaService.user.findUnique({
         where: { id: user.id },
         select: { role: true },
       });
 
-      const currentRoles = currentUser?.role || [];
+      // If user has no role yet, set it. Otherwise keep existing role.
+      const roleToUse = currentUser?.role ?? requestedRole;
 
-      // Prepare updated roles
-      const updatedRoles = currentRoles.includes(requestedRole)
-        ? currentRoles
-        : [...currentRoles, requestedRole];
-
-      // Update user: roles + login count
+      // Update user: keep original role, always increment login count
       await this.prismaService.user.update({
         where: { id: user.id },
         data: {
-          role: updatedRoles,
+          role: roleToUse,
           loginCount: { increment: 1 },
         },
       });
