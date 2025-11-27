@@ -147,7 +147,7 @@ export class UserService {
         avatar_url: picture,
         provider: 'google',
         emailVerified: true,
-        role: [role ?? UserRole.researcher], // ✅ wrap in array, default to researcher
+        role: role ?? UserRole.researcher, // ✅ wrap in array, default to researcher
         status: Status.ACTIVE, // ✅ use enum instead of string
       },
     });

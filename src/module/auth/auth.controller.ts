@@ -17,7 +17,7 @@ import { Public } from 'src/common/decorators/public';
 import { AuthGuard } from '@nestjs/passport';
 import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { getCookieDomain } from 'src/common/utils/helper';
 
 @ApiTags('Auth')
@@ -152,17 +152,13 @@ export class AuthController {
     required: false,
     description:
       'User role (admin, recruiter, researcher). Defaults to researcher.',
-    enum: ['admin', 'recruiter', 'researcher'],
+    enum: UserRole,
   })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Redirects to Google OAuth',
   })
-  async googleAuth(@Req() req: Request) {
-    // This endpoint initiates the Google OAuth flow
-    // The user will be redirected to Google for authentication
-    //front-end will send like this /auth/google?role=admin
-  }
+  async googleAuth(@Req() req: Request) {}
 
   @Public()
   @Get('google/callback')
@@ -182,10 +178,8 @@ export class AuthController {
         select: { role: true },
       });
 
-      // If user has no role yet, set it. Otherwise keep existing role.
       const roleToUse = currentUser?.role ?? requestedRole;
 
-      // Update user: keep original role, always increment login count
       await this.prismaService.user.update({
         where: { id: user.id },
         data: {
