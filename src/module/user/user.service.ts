@@ -214,11 +214,32 @@ export class UserService {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
       include: {
-        company: true, // include company if exists
-        jobPosts: true, // all job postings for recruiter
-        applications: true, // all applications for researcher
-        notifications: true, // all notifications
-        Account: true, // if needed
+        company: true, // include user's own company if exists
+        jobPosts: {
+          include: {
+            company: true, // include company of each job post
+            applications: true, // include applications for recruiter
+            savedBy: true, // users who saved this job
+          },
+        },
+        applications: {
+          include: {
+            job: {
+              include: {
+                company: true, // include company of each applied job
+                recruiter: true, // include recruiter info
+              },
+            },
+          },
+        },
+        notifications: true,
+        Account: true,
+        savedJobs: {
+          include: {
+            company: true,
+            recruiter: true,
+          },
+        },
       },
     });
 
