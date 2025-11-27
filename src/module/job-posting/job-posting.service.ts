@@ -14,64 +14,49 @@ export class JobPostingService {
     });
   }
 
-  async findAll({
-    status,
-    search,
-    location,
-    jobType,
-    startDate,
-    endDate,
-    page,
-    limit,
-  }: {
-    status?: JobStatus;
-    search?: string;
-    location?: string;
-    jobType?: JobType;
-    startDate?: string;
-    endDate?: string;
-    page: number;
-    limit: number;
-  }) {
+  async findAll(
+    currentUserId: string, // add this
+    {
+      status,
+      search,
+      location,
+      jobType,
+      startDate,
+      endDate,
+      page,
+      limit,
+    }: {
+      status?: JobStatus;
+      search?: string;
+      location?: string;
+      jobType?: JobType;
+      startDate?: string;
+      endDate?: string;
+      page: number;
+      limit: number;
+    },
+  ) {
     const where: any = {};
 
-    // status filter
+    // Filters
     if (status) where.status = status;
-
-    // jobType filter
     if (jobType) where.jobType = jobType;
-
-    // date filter
     if (startDate || endDate) {
       where.createdAt = {};
-
-      if (startDate) {
-        where.createdAt.gte = new Date(startDate);
-      }
-
-      if (endDate) {
-        where.createdAt.lte = new Date(endDate);
-      }
+      if (startDate) where.createdAt.gte = new Date(startDate);
+      if (endDate) where.createdAt.lte = new Date(endDate);
     }
     if (location) {
-      where.location = {
-        contains: location,
-        mode: 'insensitive',
-      };
+      where.location = { contains: location, mode: 'insensitive' };
     }
-
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
-        {
-          company: {
-            name: { contains: search, mode: 'insensitive' },
-          },
-        },
+        { company: { name: { contains: search, mode: 'insensitive' } } },
       ];
     }
 
-    // pagination
+    // Pagination
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
@@ -84,16 +69,28 @@ export class JobPostingService {
           recruiter: true,
           company: true,
           applications: true,
+          savedBy: {
+            where: { id: currentUserId }, // filter savedBy to current user
+            select: { id: true }, // we just need to know if saved
+          },
         },
       }),
       this.prisma.jobPosting.count({ where }),
     ]);
+
+    // Map data to include `isSaved` flag
+    const mappedData = data.map((job) => ({
+      ...job,
+      isSaved: job.savedBy.length > 0, // true if current user saved
+      savedBy: undefined, // optional: remove savedBy array from response
+    }));
+
     return {
       page,
       limit,
       total,
       totalPages: Math.ceil(total / limit),
-      data,
+      data: mappedData,
     };
   }
 
