@@ -6,17 +6,23 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
+import { RolesGuard } from 'src/common/guards/permission.guard';
+import { UserRole } from '@prisma/client';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @ApiTags('Company')
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter)
   @Post()
   @ApiOperation({ summary: 'Create a new company' })
   @ApiResponse({ status: 201, description: 'Company created successfully' })
@@ -24,6 +30,8 @@ export class CompanyController {
     return this.companyService.create(createCompanyDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter)
   @Get()
   @ApiOperation({ summary: 'Get all companies' })
   @ApiResponse({ status: 200, description: 'List of companies' })
@@ -31,6 +39,8 @@ export class CompanyController {
     return this.companyService.findAll();
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter)
   @Get(':id')
   @ApiOperation({ summary: 'Get company by ID' })
   @ApiParam({ name: 'id', description: 'Company ID' })
@@ -39,6 +49,8 @@ export class CompanyController {
     return this.companyService.findOne(id);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter, UserRole.admin)
   @Patch(':id')
   @ApiOperation({ summary: 'Update a company' })
   @ApiParam({ name: 'id', description: 'Company ID' })
@@ -47,6 +59,8 @@ export class CompanyController {
     return this.companyService.update(id, updateCompanyDto);
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.recruiter, UserRole.admin)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a company' })
   @ApiParam({ name: 'id', description: 'Company ID' })
