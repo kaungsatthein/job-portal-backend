@@ -38,6 +38,9 @@ export class AuthController {
       envMode === 'production'
         ? getCookieDomain(process.env.FRONTEND_PUBLIC_PROD_URL)
         : undefined;
+
+    console.log('this.portaldomain', this.portaldomain);
+    console.log('this.publicdomain', this.publicdomain);
   }
 
   @Public()
