@@ -19,6 +19,7 @@ import { GoogleAuthGuard } from 'src/common/guards/google-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
 import { User, UserRole } from '@prisma/client';
 import { getCookieDomain } from 'src/common/utils/helper';
+import { UserService } from '../user/user.service';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -28,6 +29,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly prismaService: PrismaService,
+    private readonly userService: UserService,
   ) {
     const envMode = process.env.NODE_ENV?.trim();
     this.portaldomain =
@@ -165,7 +167,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     try {
-      const user = req.user as any;
+      const user = req.user as User;
       const state = req.query.state
         ? JSON.parse(req.query.state as string)
         : {};
@@ -223,25 +225,25 @@ export class AuthController {
   }
 
   @Get('me')
-  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiOperation({ summary: 'Get current user profile with relations' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Current user profile',
+    description: 'Current user profile with related data',
   })
   async getCurrentUser(@Req() req: Request): Promise<any> {
-    if (!req.user) {
+    const reqUser = req.user as User;
+    if (!reqUser) {
       throw new UnauthorizedException('Not authenticated');
     }
 
-    const user = req.user as User;
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      avatar_url: user.avatar_url,
-      provider: user.provider,
-      role: user.role,
-      loginCount: user.loginCount,
-    };
+    const userId = reqUser.id;
+
+    const user = await this.userService.findUserWithRelations(userId);
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    return user;
   }
 }

@@ -2,18 +2,24 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Param,
   Patch,
   Query,
+  Req,
+  Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GetUsersQueryDto } from './dto/get-users-query.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
-import { UserRole } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { RolesGuard } from 'src/common/guards/permission.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
+import type { Response, Request } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -32,5 +38,35 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'User updated successfully' })
   updateStatus(@Param('id') id: string, @Body() dto: UpdateUserStatusDto) {
     return this.userService.updateStatus(id, dto);
+  }
+
+  @Patch('profile')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User profile updated successfully',
+  })
+  async updateProfile(
+    @Req() req: Request,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = req.user as User;
+    if (!user?.id) {
+      throw new UnauthorizedException('Not authenticated');
+    }
+    const currentUser = await this.userService.findUserById(user.id);
+
+    const roleToKeep = currentUser?.role;
+
+    const updatedUser = await this.userService.updateUser(user.id, {
+      ...updateUserDto,
+      role: roleToKeep,
+    });
+
+    return {
+      message: 'Profile updated successfully',
+      user: updatedUser,
+    };
   }
 }

@@ -119,10 +119,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Current user profile"
+            "description": "Current user profile with related data"
           }
         },
-        "summary": "Get current user profile",
+        "summary": "Get current user profile with relations",
         "tags": [
           "Auth"
         ]
@@ -233,6 +233,31 @@
           }
         },
         "summary": "Update User",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/user/profile": {
+      "patch": {
+        "operationId": "UserController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User profile updated successfully"
+          }
+        },
+        "summary": "Update current user profile",
         "tags": [
           "User"
         ]
@@ -976,6 +1001,51 @@
         "required": [
           "status"
         ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the user",
+            "example": "John Doe"
+          },
+          "avatar_url": {
+            "type": "string",
+            "description": "Avatar URL",
+            "example": "https://example.com/avatar.png"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "Birth date in ISO format",
+            "example": "1990-01-01"
+          },
+          "resumeUrl": {
+            "type": "string",
+            "description": "Resume URL",
+            "example": "https://example.com/resume.pdf"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "Phone number",
+            "example": "+1234567890"
+          },
+          "headline": {
+            "type": "string",
+            "description": "Headline or tagline",
+            "example": "Software Engineer at XYZ"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location",
+            "example": "Singapore"
+          },
+          "about": {
+            "type": "string",
+            "description": "About / bio section",
+            "example": "I love building web apps."
+          }
+        }
       },
       "CreateIndustryDto": {
         "type": "object",

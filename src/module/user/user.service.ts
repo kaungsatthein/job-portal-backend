@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { GetUsersQueryDto } from './dto/get-users-query.dto';
 import { UpdateUserStatusDto } from './dto/update-user-status.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -207,6 +208,31 @@ export class UserService {
         totalPages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async findUserWithRelations(userId: string): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: {
+        company: true, // include company if exists
+        jobPosts: true, // all job postings for recruiter
+        applications: true, // all applications for researcher
+        notifications: true, // all notifications
+        Account: true, // if needed
+      },
+    });
+
+    return user;
+  }
+
+  async updateUser(
+    id: string,
+    data: Partial<UpdateUserDto & { role: UserRole }>,
+  ): Promise<User> {
+    return this.prismaService.user.update({
+      where: { id },
+      data,
+    });
   }
 
   updateStatus(id: string, dto: UpdateUserStatusDto) {

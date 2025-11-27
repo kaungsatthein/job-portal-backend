@@ -66,6 +66,12 @@ model User {
   nrc          String?
   status       Status    @default(ACTIVE)
 
+  //add property
+  headline    String?
+  phoneNumber String?
+  location    String?
+  about       String?
+
   // Google OAuth fields
   google_id    String? @unique
   google_email String?
