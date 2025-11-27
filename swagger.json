@@ -1025,6 +1025,116 @@
           "Upload"
         ]
       }
+    },
+    "/notifications": {
+      "post": {
+        "operationId": "NotificationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNotificationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Notification created"
+          }
+        },
+        "summary": "Create new notification",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/me": {
+      "get": {
+        "operationId": "NotificationController_findMyNotifications",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get all notifications of the current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/{id}": {
+      "get": {
+        "operationId": "NotificationController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get a single notification detail",
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "delete": {
+        "operationId": "NotificationController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Delete a notification",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationController_markRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Mark notification as read",
+        "tags": [
+          "Notifications"
+        ]
+      }
     }
   },
   "info": {
@@ -1352,6 +1462,33 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "CreateNotificationDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "job_update",
+            "description": "Type of notification"
+          },
+          "message": {
+            "type": "string",
+            "example": "Your job application has been updated."
+          },
+          "userId": {
+            "type": "string",
+            "example": "user-id-123",
+            "description": "Recipient user ID"
+          },
+          "applicationId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "message",
+          "userId"
         ]
       }
     }

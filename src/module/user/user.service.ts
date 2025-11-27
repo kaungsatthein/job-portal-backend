@@ -255,7 +255,7 @@ export class UserService {
   ): Promise<User> {
     const updated = await this.prismaService.user.update({
       where: { id },
-      data,
+      data: { ...data, loginCount: { increment: 1 } },
     });
 
     await this.prismaService.notification.create({
