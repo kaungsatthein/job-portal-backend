@@ -8,25 +8,10 @@ export class CompanyService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCompanyDto: CreateCompanyDto) {
+    console.log('createCompanyDto :>> ', createCompanyDto);
     const company = await this.prisma.company.create({
-      data: createCompanyDto,
+      data: { ...createCompanyDto, status: 'pending' },
     });
-
-    // Notify all admins that a new company was created
-    const admins = await this.prisma.user.findMany({
-      where: { role: 'admin', status: { not: 'DELETE' } },
-    });
-
-    const notifications = admins.map((admin) => ({
-      userId: admin.id,
-      message: `A new company "${company.name}" has been created.`,
-      type: 'company', // or NotificationType.COMPANY if using enum
-      isRead: false,
-    }));
-
-    if (notifications.length > 0) {
-      await this.prisma.notification.createMany({ data: notifications });
-    }
 
     return company;
   }

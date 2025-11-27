@@ -32,7 +32,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get all users with pagination & search' })
   @ApiResponse({ status: 200, description: 'List of users with pagination' })
   async getAllUsers(@Query() query: GetUsersQueryDto) {
-    return this.userService.getAllUsers(query);
+    const users = this.userService.getAllUsers(query);
+    console.log('users :>> ', users);
+    return users;
   }
 
   @Patch(':id/status')

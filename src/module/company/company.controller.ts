@@ -31,7 +31,7 @@ export class CompanyController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.recruiter)
+  @Roles(UserRole.recruiter, UserRole.admin)
   @Get()
   @ApiOperation({ summary: 'Get all companies' })
   @ApiResponse({ status: 200, description: 'List of companies' })
